@@ -123,7 +123,6 @@ Function Get-Validation {
 $win = Get-Dialog $Form
 
 ##event handlers
-
 $btnFolderBrowse.add_click( {
         $folder = Get-Folder
         $files = Get-ChildItem $folder | Where-Object { $_.Extension -eq ".xml" } | Select-Object -Expand Name
@@ -160,7 +159,7 @@ $btnSeal.add_click( {
         catch {
             Get-MessageBox -message $_.Exception.Message
         }
-    
+
     })
 
 $win.add_closing( {
