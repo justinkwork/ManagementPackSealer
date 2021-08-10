@@ -5,19 +5,19 @@ $form = @"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        Title="Seal Management Pack" Height="428" Width="414">
+        Title="Seal Management Pack" MinHeight="480" MaxHeight="480" Width="416" MinWidth="416" MaxWidth="560">
     <Grid Background="#EEEEEE">
-        <TextBox Name="txtFolder" HorizontalAlignment="Center" Margin="0,64,0,0" Text="" IsEnabled="False" TextWrapping="Wrap" VerticalAlignment="Top" Width="302" Height="19"/>
-        <Button Name="btnFolderBrowse" Content="Browse" HorizontalAlignment="Left" Margin="286,88,0,0" VerticalAlignment="Top" Width="56"/>
-        <Label Content="MP Path:" HorizontalAlignment="Left" Margin="46,38,0,0" VerticalAlignment="Top"/>
-        <ComboBox Name="cmbFile" HorizontalAlignment="Center" Margin="0,145,0,0" VerticalAlignment="Top" Width="302"/>
-        <Label Content="MP File:" HorizontalAlignment="Left" Margin="46,119,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="txtKeyFile" HorizontalAlignment="Center" Margin="0,217,0,0" Text="" IsEnabled="False" TextWrapping="Wrap" VerticalAlignment="Top" Width="302" Height="19"/>
-        <Button Name="btnKeyBrowse" Content="Browse" HorizontalAlignment="Left" Margin="286,241,0,0" VerticalAlignment="Top" Width="56"/>
-        <Label Content="KeyFile:" HorizontalAlignment="Left" Margin="46,191,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="txtCompany" HorizontalAlignment="Center" Margin="0,283,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="302" Height="19"/>
-        <Label Content="Company:" HorizontalAlignment="Left" Margin="46,252,0,0" VerticalAlignment="Top"/>
-        <Button Name="btnSeal" Content="Seal" HorizontalAlignment="Center" IsEnabled="False" Margin="0,332,0,0" VerticalAlignment="Top" Height="44" Width="92"/>
+        <Label Content="MP Path:" Margin="56,34,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="txtFolder"  Margin="60,60,60,360" Text="" IsEnabled="False" TextWrapping="Wrap" Height="24" />
+        <Button Name="btnFolderBrowse" Content="Browse" Margin="226,88,0,332" Height="19" Width="56"/>
+        <Label Content="MP File:" Margin="56,120,0,0" VerticalAlignment="Top"/>
+        <ComboBox Name="cmbFile" Margin="60,146,60,270"  Height="24" />
+        <Label Content="KeyFile:" Margin="56,206,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="txtKeyFile" Margin="60,230,60,190" Text="" IsEnabled="False" TextWrapping="Wrap"  Height="24"/>
+        <Button Name="btnKeyBrowse" Content="Browse" Margin="226,258,0,162" Height="19" Width="56"/>
+        <Label Content="Company:" Margin="56,290,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="txtCompany" Margin="60,314,60,100" Text="" TextWrapping="Wrap"  Height="24"/>
+        <Button Name="btnSeal" Content="Seal" HorizontalAlignment="Center" IsEnabled="False" Margin="0,364,0,0" VerticalAlignment="Top" Height="44" Width="92"/>
     </Grid>
 </Window>
 "@
