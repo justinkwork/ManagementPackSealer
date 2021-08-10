@@ -1,4 +1,4 @@
-﻿[System.Reflection.Assembly]::LoadWithPartialName("System.collections.generic")|Out-Null
+﻿[System.Reflection.Assembly]::LoadWithPartialName("System.collections.generic") | Out-Null
 ##Form definition
 $form = @"
 <Window
@@ -23,68 +23,68 @@ $form = @"
 "@
 
 ##Function Definitions
-Function Load-Dialog {
+Function Get-Dialog {
     Param(
-        [Parameter(Mandatory=$True,Position=1)]
+        [Parameter(Mandatory = $True, Position = 1)]
         [string]$XamlPath
     )
     [xml]$xmlWPF = $XamlPath
-    try{
-        Add-Type -AssemblyName PresentationCore,PresentationFramework,WindowsBase,system.windows.forms
+    try {
+        Add-Type -AssemblyName PresentationCore, PresentationFramework, WindowsBase, system.windows.forms
     } 
     catch {
         Throw "Failed to load Windows Presentation Framework assemblies."
     }
     $xamGUI = [Windows.Markup.XamlReader]::Load((new-object System.Xml.XmlNodeReader $xmlWPF))
-    $xmlWPF.SelectNodes("//*[@Name]") | %{
+    $xmlWPF.SelectNodes("//*[@Name]") | ForEach-Object {
         Set-Variable -Name ($_.Name) -Value $xamGUI.FindName($_.Name) -Scope Global
     }
     return $xamGUI
 }
 
-Function Unload-Dialog {
+Function Remove-Dialog {
     Param(
-        [Parameter(Mandatory=$True,Position=1)]
+        [Parameter(Mandatory = $True, Position = 1)]
         [string]$XamlPath
     )
     [xml]$xmlWPF = $XamlPath
-    try{
-        Add-Type -AssemblyName PresentationCore,PresentationFramework,WindowsBase,system.windows.forms
+    try {
+        Add-Type -AssemblyName PresentationCore, PresentationFramework, WindowsBase, system.windows.forms
     } 
     catch {
         Throw "Failed to load Windows Presentation Framework assemblies."
     }
-    $xamGUI = [Windows.Markup.XamlReader]::Load((new-object System.Xml.XmlNodeReader $xmlWPF))
-    $xmlWPF.SelectNodes("//*[@Name]") | %{
+    
+    $xmlWPF.SelectNodes("//*[@Name]") | ForEach-Object {
         Remove-Variable -Name ($_.Name) -Scope Global
     }
 }
 
-Function Get-Folder($initialDirectory)
-{
-    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms")|Out-Null
+Function Get-Folder {
+    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
 
     $foldername = New-Object System.Windows.Forms.FolderBrowserDialog
     $foldername.Description = "Select a folder"
     $foldername.rootfolder = "MyComputer"
 
-    if($foldername.ShowDialog() -eq "OK")
-    {
+    if ($foldername.ShowDialog() -eq "OK") {
         $folder += $foldername.SelectedPath
     }
     return $folder
 }
 
-Function Get-FileName($initialDirectory)
-{   
- [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") |
- Out-Null
+Function Get-FileName {
+    param(
+        [string]$initialDirectory
+    )
 
- $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
- $OpenFileDialog.initialDirectory = $initialDirectory
- $OpenFileDialog.filter = "All files (*.*)| *.*"
- $OpenFileDialog.ShowDialog() | Out-Null
- $OpenFileDialog.filename
+    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+
+    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $OpenFileDialog.initialDirectory = $initialDirectory
+    $OpenFileDialog.filter = "All files (*.*)| *.*"
+    $OpenFileDialog.ShowDialog() | Out-Null
+    return $OpenFileDialog.filename
 } 
 
 
@@ -120,55 +120,52 @@ Function Get-Validation {
 #end function definitions
 
 ## Load form definition and create variables
-$win = Load-Dialog $Form
+$win = Get-Dialog $Form
 
 ##event handlers
+$btnFolderBrowse.add_click( {
+        $folder = Get-Folder
+        $files = Get-ChildItem $folder | Where-Object { $_.Extension -eq ".xml" } | Select-Object -Expand Name
+        $fileList = New-Object System.Collections.ArrayList
+        switch ($files.count) {
+            0 { Get-MessageBox -message "No XML Files Found!" }
+            1 { $fileList.Add($files) }
+            default { $fileList.AddRange($files) }
+        }
+        $txtFolder.Text = $folder
+        $cmbFile.ItemsSource = $fileList
+        Get-Validation
+    })
 
-$btnFolderBrowse.add_click({
-    $folder = Get-Folder -initialDirectory $env:USERPROFILE 
-    $files = Get-ChildItem $folder | ?{$_.Extension -eq ".xml"} | select -Expand Name
-    $fileList = New-Object System.Collections.ArrayList
-    switch ($files.count) {
-        0 {Get-MessageBox -message "No XML Files Found!"}
-        1 {$fileList.Add($files)}
-        default {$fileList.AddRange($files)}
-    }
-    $txtFolder.Text = $folder
-    $cmbFile.ItemsSource = $fileList
-    Get-Validation
-    
-})
+$cmbFile.add_selectionChanged( {
+        Get-Validation
+    })
 
-$cmbFile.add_selectionChanged({
-    Get-Validation
-})
+$btnKeyBrowse.add_click( {
+        $keyFile = Get-FileName -initialDirectory $env:USERPROFILE
+        $txtKeyFile.Text = $keyFile
+        Get-Validation
+    })
 
-$btnKeyBrowse.add_click({
-    $keyFile = Get-FileName -initialDirectory $env:USERPROFILE
-    $txtKeyFile.Text = $keyFile
-    Get-Validation
-    
-})
+$txtCompany.add_keyup( {
+        Get-Validation
+    })
 
-$txtCompany.add_keyup({
-    Get-Validation
-})
+$btnSeal.add_click( {
+        try {
+            Invoke-SealMP -mpDir $txtFolder.Text -fileName $cmbFile.SelectedItem -keyFile $txtKeyFile.Text -company $txtCompany.Text
+            Get-MessageBox -message "MP Sealed!"
+        }
+        catch {
+            Get-MessageBox -message $_.Exception.Message
+        }
 
-$btnSeal.add_click({
-    try {
-        Invoke-SealMP -mpDir $txtFolder.Text -fileName $cmbFile.SelectedItem -keyFile $txtKeyFile.Text -company $txtCompany.Text
-        Get-MessageBox -message "MP Sealed!"
-    }
-    catch {
-        Get-MessageBox -message $_.Exception.Message
-    }
-    
-})
+    })
 
-$win.add_closing({
-    #remove all the variables
-    Unload-Dialog -XamlPath $form
-})
+$win.add_closing( {
+        #remove all the variables
+        Remove-Dialog -XamlPath $form
+    })
 
 
 #launch window 
